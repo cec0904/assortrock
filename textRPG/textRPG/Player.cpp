@@ -49,16 +49,16 @@ bool CPlayer::Init()
 	switch (mJob)
 	{
 	case eJobClass::Warrior :			// 전사
-		AllStateSet(200, 10, 10);
+		AllStateSet(200, 10, 10, 10);
 		break;
 	case eJobClass::Wizard :			// 마법사
-		AllStateSet(150, 12, 6);
+		AllStateSet(150, 12, 6, 12);
 		break;
 	case eJobClass::Archer:				// 궁수
-		AllStateSet(100, 15, 7);
+		AllStateSet(100, 15, 7, 15);
 		break;
 	case eJobClass::Rogue :				// 도적
-		AllStateSet(130, 14, 6);
+		AllStateSet(130, 14, 6, 13);
 		break;
 	}
 	
@@ -98,6 +98,11 @@ void CPlayer::Update()
 	case ePlayerState::combat:
 		CombatStateUpdate(message);
 		break;
+	case ePlayerState::win:
+		WinUpdate(message);
+	case ePlayerState::lose:
+		LoseUpdate(message);
+		
 	}
 }
 
@@ -120,7 +125,9 @@ void CPlayer::PlayerInfoDraw()
 	COUT("공격력\t: " << mATK << "\t\t|\t");
 	//DEF
 	COUTN("방어력\t: " << mDEF);
-	COUTN("-------------------------------------");
+	//SPD
+	COUTN("스피드\t: " << mSPD << "\t\t|\t");
+	COUTN("-------------------------------------------");
 }
 
 void CPlayer::PlayerSearchDraw()
@@ -137,9 +144,9 @@ void CPlayer::PlayerCombatDraw()
 {
 	COUTN("");
 	COUTN("\t=================================");
-	COUTN("\t|            행동 선택           |");
+	COUTN("\t|   [1] 공격          [2] 방어   |");
 	COUTN("\t---------------------------------");
-	COUTN("\t|   [1] 공격 [2] 방어 [3] 도망   |");
+	COUTN("\t|   [3] 버프          [4] 도망   |");
 	COUTN("\t=================================");
 }
 
@@ -173,17 +180,98 @@ void CPlayer::BasicStateUpdate(int _message)
 
 void CPlayer::CombatStateUpdate(int _message)
 {
-	switch (1)
+	CGameManager* GameMgr = CGameManager::GetInst();
+	CPlayer* pPlayer = GameMgr->GetPlayer();
+	CMonster* pMonster = GameMgr->GetMonster();
+	switch (_message)
 	{
 	case 1:
-		CGameManager::GetInst()->GetMonster()->TakeDamage(mATK);
+		mCombatMod = ePlayerCombatMod::Attack;
+
+		if (pMonster->GetSPD() < pPlayer->GetSPD())
+		{
+			pPlayer->TakeDamage(pPlayer->GetATK() - pMonster->GetDEF());
+			// 호출한 객체에게 피해를 주는 멤버 함수
+			// 몬스터에게 내 공격력 만큼 피해를 준다.
+			cout << pMonster->GetName() << "에게 " << mATK << "만큼 피해를 주었습니다." << endl;
+			Sleep(1500);
+			pMonster->TakeDamage(pMonster->GetATK() - pPlayer->GetDEF());
+			cout << pMonster->GetName() << "가 " << mATK << "만큼 피해를 주었습니다." << endl;
+			
+		}
+		else
+		{
+			pPlayer->TakeDamage(pPlayer->GetATK() - pMonster->GetDEF());
+			cout << pMonster->GetName() << "(이)가 " << mATK << "만큼 피해를 주었습니다." << endl;
+			Sleep(1500);
+			pMonster->TakeDamage(pMonster->GetATK() - pPlayer->GetDEF());
+			// 호출한 객체에게 피해를 주는 멤버 함수
+			// 몬스터에게 내 공격력 만큼 피해를 준다.
+			cout << pMonster->GetName() << "에게 " << mATK << "만큼 피해를 주었습니다." << endl;
+		}
+
+		SYSPAUSE;
+		
+		if (CGameManager::GetInst()->GetMonster()->GetHP() <= 0)
+		{
+			int a = rand() % 10 + 1;
+			int b = rand() % 10 + 1;
+
+			cout << a << "경험치와 " << b << "골드를 획득했습니다." << endl;
+			SYSPAUSE;
+			mEXP += a;
+			mMoney += b;
+
+			CGameManager::GetInst()->DeleteMonster();
+			mState = ePlayerState::research;
+		}
 		break;
-	case2:
+	case 2:
+		
+		if (pMonster->GetATK() <= pPlayer->GetDEF())
+		{
+			cout << "방어! 받은 피해: ";
+			pPlayer->TakeDefense(1);
+		}
+		else if(pMonster->GetATK() > pPlayer->GetDEF())
+		{
+			cout << "방어! 받은 피해: ";
+			TakeDefense(pMonster->GetATK() - pPlayer->GetDEF());
+		}
+		//else if (pPlayer->GetATK() > pMonster->GetDEF())
+		//{
+		//	cout << "방어! 몬스터가 받은 피해: " << pMonster->GetDEF() - pPlayer->GetATK() << endl;
+		//}
+		//else if (pPlayer->GetATK() < pMonster->GetDEF())
+		//{
+		//	cout << "방어! 몬스터가 받은 피해: 1";
+		//}
+
+		
+		break;
+	case 3:
+		mCombatMod = ePlayerCombatMod::SpeedDown;
+		pMonster->TakeSpeedDown(1);
+		COUTN(mName << "이 상대 스피드를 낮췄습니다.");
+		SYSPAUSE;
+		break;
+	case 4:
+		mCombatMod = ePlayerCombatMod::Run;
+		COUTN(mName << "이 도망을 선택했습니다.");
+		mState = ePlayerState::research;
+		GameMgr->DeleteMonster();
+		SYSPAUSE;
 		break;
 
-	case 3:
-		break;
 	}
+}
+void CPlayer::WinUpdate(int _message)
+{
+	
+}
+
+void CPlayer::LoseUpdate(int _message)
+{
 }
 
 void CPlayer::SearchUpdate(int _message)
@@ -193,11 +281,11 @@ void CPlayer::SearchUpdate(int _message)
 		//탐색 중입니다. 
 	COUTN("탐색 중 입니다.");
 	// 3초정도 뜸들이고 
-	Sleep(1000);
+	Sleep(500);
 	COUTN("...");
-	Sleep(1000);
+	Sleep(500);
 	COUTN("...");
-	Sleep(1000);
+	Sleep(500);
 	COUTN("...");
 
 	int temp = 0;
@@ -211,8 +299,8 @@ void CPlayer::SearchUpdate(int _message)
 	4. 다음 층 이동
 	*/
 
-//switch ((eEventType)behavior)
 	switch (eEventType::Enemy)
+	//switch ((eEventType)temp)
 	{
 	case eEventType::NONE:
 		//아무것도 못찾았습니다. 
@@ -249,5 +337,10 @@ void CPlayer::SearchUpdate(int _message)
 		// 플에이어는 전투 중 상태로 변경한다.
 		mState = ePlayerState::combat;
 		break;
+
 	}
+	
+
 }
+
+

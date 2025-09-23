@@ -112,6 +112,11 @@ void CGameManager::Update()
 	{
 		mPlayer->Update();
 	}
+
+	if (mMonster)
+	{
+		mMonster->Update();
+	}
 }
 
 
@@ -157,11 +162,11 @@ void CGameManager::Release()
 
 void CGameManager::Input()
 {
-	COUTN("-------------------------------------");
+	COUTN("-------------------------------------------");
 	COUT("행동을 선택해 주세요 : ");
 	cin >> mInputMessage;
 	SYSPAUSE;
-	COUTN("-------------------------------------");
+	COUTN("-------------------------------------------");
 }
 
 

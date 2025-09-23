@@ -6,6 +6,10 @@ class CPlayer : public CObject
 private:
 	ePlayerState mState;
 
+	ePlayerCombatMod mCombatMod;
+
+	eJobClass mJob;
+
 public:
 	CPlayer();
 	virtual ~CPlayer() override;
@@ -25,6 +29,8 @@ private:
 	void BasicStateUpdate(int _message);
 	void CombatStateUpdate(int _message);
 	void SearchUpdate(int _message);
+	void WinUpdate(int _message);
+	void LoseUpdate(int _message);
 
 };
 

@@ -1,9 +1,14 @@
 #pragma once
 #include "Object.h"
 
+
 class CMonster : public CObject
 {
 protected:
+	bool bIsInit = false;
+
+
+
 	eMonsterType mMonsterType;
 	//몬스터를 그려주는 함수를 만들 것이다.
 	void(*mDrawMonsterImage)();
@@ -24,7 +29,13 @@ public:
 	eMonsterType GetMonsterType() { return mMonsterType; }
 	void SetMonsterType(eMonsterType _type) { mMonsterType = _type; }
 
-	void MonsterSetting(string _name, int _level, int _exp, int _money, int _hp, int _atk, int _def);
+	void MonsterSetting(string _name, int _level, int _exp, int _money, int _hp, int _atk, int _def, int _spd);
 	
+
+	
+
+
+
+
 };
 

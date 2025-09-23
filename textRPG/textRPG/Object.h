@@ -25,6 +25,8 @@ protected:
 	int mATK = DEFAULT_ATK;
 	//방어력 
 	int mDEF = DEFAULT_DEF;
+	//스피드 
+	int mSPD = DEFAULT_SPD;
 	
 
 public:
@@ -40,6 +42,7 @@ public:
 	int GetMaxHP() { return mMaxHP; }
 	int GetATK() { return mATK; }
 	int GetDEF() { return mDEF; }
+	int GetSPD() { return mSPD; }
 
 	//Set
 	void SetMoney(int _money) { mMoney = _money; }
@@ -50,16 +53,18 @@ public:
 	void SetMaxHP(int _maxhp) { mMaxHP = _maxhp; }
 	void SetATK(int _atk) { mATK = _atk; }
 	void SetDEF(int _def) { mDEF = _def; }
+	void SetSPD(int _spd) { mSPD = _spd; }
 	
 
 	//능력 스탯 지정해주는 함수 
 	//체력, 공격력, 방어력 
-	inline void AllStateSet(int _hp, int _atk, int _def)
+	inline void AllStateSet(int _hp, int _atk, int _def, int _spd)
 	{
 		mMaxHP = _hp;
 		mHP = mMaxHP;
 		mATK = _atk;
 		mDEF = _def;
+		mSPD = _spd;
 	}
 
 
@@ -70,6 +75,11 @@ public:
 	virtual void Update() = 0;
 
 	virtual void TakeDamage(int _damage);
+	virtual void TakeDefense(int _defense);
+	virtual void TakeSpeedDown(int _speeddown);
+	
+	
+
 public:
 	CObject() = default;
 	virtual ~CObject() = default;

@@ -32,6 +32,7 @@ public:\
 #define DEFAULT_HP 100
 #define DEFAULT_ATK 10
 #define DEFAULT_DEF 5
+#define DEFAULT_SPD 10
 
 enum class eJobClass
 {
@@ -49,7 +50,21 @@ enum class ePlayerState
 	research,
 	//전투
 	combat,
+    //승리
+    win,
+    // 패배
+    lose,
 	END
+};
+
+enum class ePlayerCombatMod
+{
+    None,
+    Attack,
+    Defense,
+    Run,
+    SpeedDown,
+    Max
 };
 
 enum class eEventType
@@ -57,6 +72,7 @@ enum class eEventType
 	NONE,
 	Treasure,
 	Enemy,
+    EnemyDie,
 	Next,
 	MAX
 };
@@ -84,6 +100,48 @@ namespace GlobalFunc
                 *  *  *
 )" << std::endl;
     }
+
+    static void PrintGoblinImage()
+    {
+        std::cout << R"(
+           ,      ,
+          /(.-""-.)\
+      |\  \/      \/  /|
+      | \ / =.  .= \ / |
+      \( \   o\/o   / )/
+       \_, '-/  \-' ,_/
+         /   \__/   \
+         \ \__||__/ /
+          \   ||   /
+           \  ||  /
+            '.||.'
+              ``
+)" << std::endl;
+    }
+
+    static void PrintOrcImage()
+    {
+        std::cout << R"(
+          ___  _____
+        .'/,-Y"     "~-.  
+        l.Y             ^.       
+        /\               _\_     
+       i            ___/"   "\ 
+       |          /"   "\   o !   
+       l         ]     o !__./   
+        \ _  _    \.___./    "~\  
+         X \/ \            ___./  
+        ( \ ___.   _..--~~"   ~`-.  
+         ` Z,--   /               \    
+           \__.  (   /       ______) 
+             \   l  /-----~~" /      
+              Y   \          /       
+              |    "x______.^        
+              |           \          
+              |            \     
+)" << std::endl;
+    }
+
 
 
 
