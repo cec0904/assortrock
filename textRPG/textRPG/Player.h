@@ -19,18 +19,20 @@ public:
 	virtual bool Init() override;
 	virtual void Draw() override;
 	virtual void Update() override;
+	void SaveLoadSelect();
+	string JobToString(eJobClass _job);
 
 private:
 	void PlayerInfoDraw();
 	void PlayerSearchDraw();
 	void PlayerCombatDraw();
-	string JobToString(eJobClass _job);
 
 	void BasicStateUpdate(int _message);
 	void CombatStateUpdate(int _message);
 	void SearchUpdate(int _message);
-	void WinUpdate(int _message);
-	void LoseUpdate(int _message);
+	void CombatWinUpdate(int _message);
+	void CombatLoseUpdate(int _message);
 
+	void Attack();
 };
 

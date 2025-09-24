@@ -28,8 +28,13 @@ private:
 	// 입력받기
 	void Input();
 
+	
+
+
 public:
 	void GameRun();
+
+	void SaveLoadScreen();
 
 	int GetInputMessage()
 	{
@@ -56,6 +61,13 @@ public:
 	}
 	
 #pragma endregion
+
+	void SaveGame();
+	void LoadGame();
+
+
+
+
 
 private:
 	//싱글톤 

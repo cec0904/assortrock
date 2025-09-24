@@ -33,7 +33,7 @@ public:
 
 	//get
 	string GetName() { return mName; }
-	//eJobClass GetJon() { return eJobClass::; }
+	eJobClass GetJobClass() { return mJob; }
 	int GetMoney() { return mMoney; }
 	int GetExp() { return mEXP; }
 	int GetMaxExp() {return mMaxExp;}

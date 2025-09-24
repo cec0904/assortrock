@@ -3,6 +3,7 @@
 #include "Monster.h"
 
 
+
 CPlayer::CPlayer()
 	:mState(ePlayerState::research)
 {
@@ -32,35 +33,55 @@ bool CPlayer::Init()
 	printf("      ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ\n");
 	printf("                Doom Tower\n\n");
 
-	COUT("이름을 입력해주세요 : ")
-	cin >> mName;
+	SaveLoadSelect();
 
-	int selectJob = 0;
+	cout << "번호를 선택해 주세요 : ";
 
-	do
+
+
+	int SaveLoadSelect = 0;
+	cin >> SaveLoadSelect;
+
+	if (SaveLoadSelect == 1)
 	{
-		COUTN("직업을 선택해주세요.");
-		COUTN("1.전사 2.마법사 3.궁수 4.도적");
-		cin >> selectJob;
-	} while (selectJob < 1 || selectJob > 4);
+		SYSCLS;
+		COUT("이름을 입력해주세요 : ")
+			cin >> mName;
 
-	//직업에 따라 시작 스탯을 다르게 한다. 
-	mJob = (eJobClass)selectJob;
-	switch (mJob)
-	{
-	case eJobClass::Warrior :			// 전사
-		AllStateSet(200, 10, 10, 10);
-		break;
-	case eJobClass::Wizard :			// 마법사
-		AllStateSet(150, 12, 6, 12);
-		break;
-	case eJobClass::Archer:				// 궁수
-		AllStateSet(100, 15, 7, 15);
-		break;
-	case eJobClass::Rogue :				// 도적
-		AllStateSet(130, 14, 6, 13);
-		break;
+		int selectJob = 0;
+
+		do
+		{
+			COUTN("직업을 선택해주세요.");
+			COUTN("1.전사 2.마법사 3.궁수 4.도적");
+			cin >> selectJob;
+		} while (selectJob < 1 || selectJob > 4);
+
+		//직업에 따라 시작 스탯을 다르게 한다. 
+		mJob = (eJobClass)selectJob;
+		switch (mJob)
+		{
+		case eJobClass::Warrior:			// 전사
+			AllStateSet(200, 10, 10, 10);
+			break;
+		case eJobClass::Wizard:			// 마법사
+			AllStateSet(150, 12, 6, 12);
+			break;
+		case eJobClass::Archer:				// 궁수
+			AllStateSet(100, 15, 7, 15);
+			break;
+		case eJobClass::Rogue:				// 도적
+			AllStateSet(130, 14, 6, 13);
+			break;
+		}
 	}
+
+	else if (SaveLoadSelect == 2)
+	{
+		CGameManager* pSaveLoad = CGameManager::GetInst();
+		pSaveLoad->SaveLoadScreen();
+	}
+	
 	
 
 	return true;
@@ -99,11 +120,21 @@ void CPlayer::Update()
 		CombatStateUpdate(message);
 		break;
 	case ePlayerState::win:
-		WinUpdate(message);
+		CombatWinUpdate(message);
 	case ePlayerState::lose:
-		LoseUpdate(message);
+		CombatLoseUpdate(message);
 		
 	}
+}
+
+void CPlayer::SaveLoadSelect()
+{
+	COUTN("");
+	COUTN("\t=================================");
+	COUTN("\t|          [1] 시작하기          |");
+	COUTN("\t---------------------------------");
+	COUTN("\t|          [2] 불러오기          |");
+	COUTN("\t=================================");
 }
 
 void CPlayer::PlayerInfoDraw()
@@ -186,45 +217,8 @@ void CPlayer::CombatStateUpdate(int _message)
 	switch (_message)
 	{
 	case 1:
-		mCombatMod = ePlayerCombatMod::Attack;
-
-		if (pMonster->GetSPD() < pPlayer->GetSPD())
-		{
-			pPlayer->TakeDamage(pPlayer->GetATK() - pMonster->GetDEF());
-			// 호출한 객체에게 피해를 주는 멤버 함수
-			// 몬스터에게 내 공격력 만큼 피해를 준다.
-			cout << pMonster->GetName() << "에게 " << mATK << "만큼 피해를 주었습니다." << endl;
-			Sleep(1500);
-			pMonster->TakeDamage(pMonster->GetATK() - pPlayer->GetDEF());
-			cout << pMonster->GetName() << "가 " << mATK << "만큼 피해를 주었습니다." << endl;
-			
-		}
-		else
-		{
-			pPlayer->TakeDamage(pPlayer->GetATK() - pMonster->GetDEF());
-			cout << pMonster->GetName() << "(이)가 " << mATK << "만큼 피해를 주었습니다." << endl;
-			Sleep(1500);
-			pMonster->TakeDamage(pMonster->GetATK() - pPlayer->GetDEF());
-			// 호출한 객체에게 피해를 주는 멤버 함수
-			// 몬스터에게 내 공격력 만큼 피해를 준다.
-			cout << pMonster->GetName() << "에게 " << mATK << "만큼 피해를 주었습니다." << endl;
-		}
-
-		SYSPAUSE;
-		
-		if (CGameManager::GetInst()->GetMonster()->GetHP() <= 0)
-		{
-			int a = rand() % 10 + 1;
-			int b = rand() % 10 + 1;
-
-			cout << a << "경험치와 " << b << "골드를 획득했습니다." << endl;
-			SYSPAUSE;
-			mEXP += a;
-			mMoney += b;
-
-			CGameManager::GetInst()->DeleteMonster();
-			mState = ePlayerState::research;
-		}
+		Attack();
+		CombatWinUpdate(_message);
 		break;
 	case 2:
 		
@@ -265,13 +259,115 @@ void CPlayer::CombatStateUpdate(int _message)
 
 	}
 }
-void CPlayer::WinUpdate(int _message)
+void CPlayer::CombatWinUpdate(int _message)
 {
-	
+	// 몬스터 체력 0 됐을 때
+	if (CGameManager::GetInst()->GetMonster()->GetHP() <= 0)
+	{
+		int a = rand() % 10 + 1;
+		int b = rand() % 10 + 1;
+
+		cout << a << "경험치와 " << b << "골드를 획득했습니다." << endl;
+		SYSPAUSE;
+		mEXP += a;
+		mMoney += b;
+
+		CGameManager::GetInst()->DeleteMonster();
+		mState = ePlayerState::research;
+	}
 }
 
-void CPlayer::LoseUpdate(int _message)
+void CPlayer::CombatLoseUpdate(int _message)
 {
+}
+
+void CPlayer::Attack()
+{
+	CMonster* pMonster = CGameManager::GetInst()->GetMonster();
+
+	mCombatMod = ePlayerCombatMod::Attack;
+
+	if (pMonster->GetSPD() <= mSPD)
+	{
+		// 몬스터 방어력 > 플레이어 공격력
+		if (pMonster->GetDEF() > mATK)
+		{
+			pMonster->TakeDamage(1 + pMonster->GetLevel());
+			cout << pMonster->GetName() << "에게 " << 1 + pMonster->GetLevel() << "만큼 피해를 주었습니다." << endl;
+
+		}
+		// 몬스터 방어력 <= 플레이어 공격력
+		else
+		{
+			pMonster->TakeDamage(mATK - pMonster->GetDEF());
+			cout << pMonster->GetName() << "에게 " << mATK - pMonster->GetDEF() << "만큼 피해를 주었습니다." << endl;
+
+		}
+
+		//		10				3			1+레벨
+		// 플레이어 방어력 > 몬스터 공격력
+		if (mDEF > pMonster->GetATK())
+		{
+			TakeDamage(pMonster->GetLevel() + 1);
+			cout << mName << "(이)가 " << pMonster->GetLevel() + 1 << "만큼 피해를 받았습니다." << endl;
+
+		}
+
+		//		10				15			5 들어오게
+		// 플레이어 방여력 <= 몬스터 공격력
+		else
+		{
+
+			TakeDamage(mDEF - pMonster->GetATK());
+			cout << mName << "(이)가 " << mDEF - pMonster->GetATK() << "만큼 피해를 받았습니다." << endl;
+		}
+
+	}
+	else
+	{
+
+		//		10				3			1+레벨
+		// 플레이어 방어력 > 몬스터 공격력
+		if (mDEF > pMonster->GetATK())
+		{
+			TakeDamage(1 + mLevel);
+			cout << mName << "(이)가 " << 1 + mLevel << "만큼 피해를 받았습니다." << endl;
+
+		}
+
+		//		10				15			5 들어오게
+		// 플레이어 방여력 <= 몬스터 공격력
+		else
+		{
+
+			TakeDamage(mDEF - pMonster->GetATK());
+			cout << mName << "(이)가 " << mDEF - pMonster->GetATK() << "만큼 피해를 받았습니다." << endl;
+		}
+
+
+		// 몬스터 방어력 > 플레이어 공격력
+		if (pMonster->GetDEF() > mATK)
+		{
+			pMonster->TakeDamage(1 + pMonster->GetLevel());
+			cout << pMonster->GetName() << "에게 " << 1 + pMonster->GetLevel() << "만큼 피해를 주었습니다." << endl;
+
+		}
+		// 몬스터 방어력 <= 플레이어 공격력
+		else
+		{
+			pMonster->TakeDamage(this->mATK - mDEF);
+			cout << pMonster->GetName() << "에게 " << mATK - pMonster->GetDEF() << "만큼 피해를 주었습니다." << endl;
+
+		}
+
+		
+	}
+
+	SYSPAUSE;
+
+
+	
+	
 }
 
 void CPlayer::SearchUpdate(int _message)
@@ -342,5 +438,6 @@ void CPlayer::SearchUpdate(int _message)
 	
 
 }
+
 
 

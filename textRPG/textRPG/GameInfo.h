@@ -8,6 +8,11 @@
 #include <string>
 #include <vector>
 
+
+#include <direct.h>
+#include <fstream>
+
+
 using namespace std;
 
 //std 하나씩 붙이자 using X

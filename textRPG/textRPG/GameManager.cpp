@@ -37,6 +37,65 @@ void CGameManager::GameRun()
 
 }
 
+void CGameManager::SaveLoadScreen()
+{
+	
+
+	struct PlayerInfo
+	{
+		CGameManager* GameMgr = CGameManager::GetInst();
+		CPlayer* pPlayer = GameMgr->GetPlayer();
+
+		string pName = pPlayer->GetName();
+		string pJob = pPlayer->JobToString(pPlayer->GetJobClass());
+		int pExp = pPlayer->GetExp();
+		int pLev = pPlayer->GetLevel();
+		int pHP = pPlayer->GetHP();
+		int pMoney = pPlayer->GetMoney();
+		int pATK = pPlayer->GetATK();
+		int pDEF = pPlayer->GetDEF();
+	};
+	
+
+	//// 이름 직업 경험치 레벨 체력 돈 공 방
+	//vector<string> pName{ pPlayer->GetName()};
+	//vector<int> pState{ pPlayer->GetExp(),pPlayer->GetLevel(), pPlayer->GetHP(), pPlayer->GetMoney(), pPlayer->GetATK(), pPlayer->GetDEF() };
+
+	vector<PlayerInfo> player;
+	player.push_back(PlayerInfo{});
+
+	ofstream oFile("PlayerData.txt");
+	if (oFile.is_open())
+	{
+
+
+		for (auto& p : player)
+		{
+			oFile << stoi(p.pName) << ", " << stoi(p.pJob) << ", " << p.pExp << ", " << p.pLev << ", " << p.pHP << ", " << p.pMoney << ", " << p.pATK << ", " << p.pDEF << endl;
+		}
+
+		player.clear();
+	}
+	
+	string path = "E:\SVN\cec0904\\textRPG\Save";
+
+
+
+
+}
+
+void CGameManager::SaveGame()
+{
+
+	
+}
+
+void CGameManager::LoadGame()
+{
+
+
+}
+
 void CGameManager::NextStage()
 {
 	mStageLevel += 1;
@@ -75,6 +134,8 @@ void CGameManager::DeleteMonster()
 	}
 	mMonster = nullptr;
 }
+
+
 
 bool CGameManager::Init()
 {
@@ -168,5 +229,7 @@ void CGameManager::Input()
 	SYSPAUSE;
 	COUTN("-------------------------------------------");
 }
+
+
 
 
