@@ -34,7 +34,10 @@ private:
 public:
 	void GameRun();
 
-	void SaveLoadScreen();
+	void SaveGame(int n);
+	void SaveScreen();
+	void LoadGame();
+	void LoadScreen();
 
 	int GetInputMessage()
 	{
@@ -62,8 +65,7 @@ public:
 	
 #pragma endregion
 
-	void SaveGame();
-	void LoadGame();
+
 
 
 

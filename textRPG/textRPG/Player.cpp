@@ -79,7 +79,7 @@ bool CPlayer::Init()
 	else if (SaveLoadSelect == 2)
 	{
 		CGameManager* pSaveLoad = CGameManager::GetInst();
-		pSaveLoad->SaveLoadScreen();
+		pSaveLoad->LoadScreen();
 	}
 	
 	
@@ -168,6 +168,8 @@ void CPlayer::PlayerSearchDraw()
 	COUTN("\t|            행동 선택           |");
 	COUTN("\t---------------------------------");
 	COUTN("\t|     [1] 탐색        [2] 휴식   |");
+	COUTN("\t---------------------------------");
+	COUTN("\t|     [3] 저장        [4] 메인   |");
 	COUTN("\t=================================");
 }
 
@@ -198,12 +200,54 @@ std::string CPlayer::JobToString(eJobClass _job)
 
 void CPlayer::BasicStateUpdate(int _message)
 {
+	CGameManager* Save = CGameManager::GetInst();
 	switch (_message)
 	{
 	case 1:	// 탐색 
 		SearchUpdate(_message);
 		break;
-	case 2:	// 휴식 
+	case 2:	// 휴식
+	case 3:	// 저장하기
+	{
+		int num3 = 0;
+		cout << "현재까지의 상황을 저장하시겠습니까 ? 1. Yes			2. No" << endl;
+		cout << "번호를 입력해주세요 : ";
+		cin >> num3;
+		if (num3 == 1)
+		{
+			Save->SaveScreen();
+
+			Save->SaveGame();
+		}
+		else if (num3 == 2)
+		{
+			break;
+		}
+		
+		break;
+	}
+		
+		
+	case 4:	//시작화면으로 나가기
+	{
+		int num4 = 0;
+		cout << "진행상황이 초기화 됩니다. 괜찮으십니까 ? 1. Yes			2. No" << endl;
+		cout << "번호를 입력해주세요 : ";
+		cin >> num4;
+		if (num4 == 1)
+		{
+			SYSCLS;
+			Init();
+		}
+		else if (num4 == 2)
+		{
+			break;
+		}
+	}
+		
+		
+		
+
 
 		break;
 	}
@@ -292,14 +336,14 @@ void CPlayer::Attack()
 		// 몬스터 방어력 > 플레이어 공격력
 		if (pMonster->GetDEF() > mATK)
 		{
-			pMonster->TakeDamage(1 + pMonster->GetLevel());
-			cout << pMonster->GetName() << "에게 " << 1 + pMonster->GetLevel() << "만큼 피해를 주었습니다." << endl;
+			pMonster->TakeDamage(1 + this->GetLevel());
+			cout << pMonster->GetName() << "에게 " << 1 + this->GetLevel() << "만큼 피해를 주었습니다." << endl;
 
 		}
 		// 몬스터 방어력 <= 플레이어 공격력
 		else
 		{
-			pMonster->TakeDamage(mATK - pMonster->GetDEF());
+			pMonster->TakeDamage(this->mATK - pMonster->GetDEF());
 			cout << pMonster->GetName() << "에게 " << mATK - pMonster->GetDEF() << "만큼 피해를 주었습니다." << endl;
 
 		}
@@ -348,14 +392,14 @@ void CPlayer::Attack()
 		// 몬스터 방어력 > 플레이어 공격력
 		if (pMonster->GetDEF() > mATK)
 		{
-			pMonster->TakeDamage(1 + pMonster->GetLevel());
-			cout << pMonster->GetName() << "에게 " << 1 + pMonster->GetLevel() << "만큼 피해를 주었습니다." << endl;
+			pMonster->TakeDamage(1 + this->GetLevel());
+			cout << pMonster->GetName() << "에게 " << 1 + this->GetLevel() << "만큼 피해를 주었습니다." << endl;
 
 		}
 		// 몬스터 방어력 <= 플레이어 공격력
 		else
 		{
-			pMonster->TakeDamage(this->mATK - mDEF);
+			pMonster->TakeDamage(this->mATK - pMonster->GetDEF());
 			cout << pMonster->GetName() << "에게 " << mATK - pMonster->GetDEF() << "만큼 피해를 주었습니다." << endl;
 
 		}

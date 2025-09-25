@@ -37,7 +37,7 @@ void CGameManager::GameRun()
 
 }
 
-void CGameManager::SaveLoadScreen()
+void CGameManager::SaveGame(int n)
 {
 	
 
@@ -64,37 +64,58 @@ void CGameManager::SaveLoadScreen()
 	vector<PlayerInfo> player;
 	player.push_back(PlayerInfo{});
 
-	ofstream oFile("PlayerData.txt");
+	string path = "E:\\SVN\\cec0904\\textRPG\\Save";
+	ofstream oFile(path);
 	if (oFile.is_open())
 	{
 
 
 		for (auto& p : player)
 		{
-			oFile << stoi(p.pName) << ", " << stoi(p.pJob) << ", " << p.pExp << ", " << p.pLev << ", " << p.pHP << ", " << p.pMoney << ", " << p.pATK << ", " << p.pDEF << endl;
+			oFile << p.pName << ", " << p.pJob << ", " << p.pExp << ", " << p.pLev << ", " << p.pHP << ", " << p.pMoney << ", " << p.pATK << ", " << p.pDEF << endl;
 		}
 
 		player.clear();
 	}
 	
-	string path = "E:\SVN\cec0904\\textRPG\Save";
+
 
 
 
 
 }
 
-void CGameManager::SaveGame()
+void CGameManager::SaveScreen()
 {
-
-	
 }
 
 void CGameManager::LoadGame()
 {
+	string path = "E:\\SVN\\cec0904\\textRPG\\Save";
+	ifstream iFile(path);
 
+	if (iFile.is_open())
+	{
+		string line = " ";
+		while (getline(iFile, line))
+		{
+			if (line.empty())
+			{
+				continue;
+			}
 
+			
+		}
+	}
 }
+
+void CGameManager::LoadScreen()
+{
+}
+
+
+
+
 
 void CGameManager::NextStage()
 {
